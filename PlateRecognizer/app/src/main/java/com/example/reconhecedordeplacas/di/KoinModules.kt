@@ -1,5 +1,8 @@
 package com.example.reconhecedordeplacas.di
 
+import com.example.reconhecedordeplacas.api.PlateRecognizerApi
+import com.example.reconhecedordeplacas.api.PlateRecognizerClient
+import com.example.reconhecedordeplacas.viewmodel.CameraViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.androidx.viewmodel.dsl.viewModel
