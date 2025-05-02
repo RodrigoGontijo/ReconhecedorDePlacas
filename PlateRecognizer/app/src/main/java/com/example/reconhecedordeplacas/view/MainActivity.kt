@@ -1,4 +1,4 @@
-package com.example.reconhecedordeplacas
+package com.example.reconhecedordeplacas.view
 
 import android.Manifest
 import android.os.Bundle
@@ -15,7 +15,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import org.koin.androidx.compose.getViewModel
 
 class MainActivity : ComponentActivity() {
