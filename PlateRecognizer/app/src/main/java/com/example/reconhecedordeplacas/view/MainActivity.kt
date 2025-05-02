@@ -2,8 +2,10 @@ package com.example.reconhecedordeplacas.view
 
 import android.Manifest
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
@@ -14,15 +16,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.app.ActivityCompat
+import com.example.reconhecedordeplacas.viewmodel.CameraViewModel
 import org.koin.androidx.compose.getViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private var permissionGranted = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 0)
+        val permissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                permissionGranted = true
+                launchCameraUI()
+            } else {
+                Toast.makeText(this, "Permissão de câmera negada", Toast.LENGTH_LONG).show()
+            }
+        }
 
+        permissionLauncher.launch(Manifest.permission.CAMERA)
+    }
+
+    private fun launchCameraUI() {
         setContent {
             VehicleWatcherApp()
         }

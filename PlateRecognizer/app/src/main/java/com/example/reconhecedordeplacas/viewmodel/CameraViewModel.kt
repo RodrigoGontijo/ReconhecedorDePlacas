@@ -1,12 +1,14 @@
 package com.example.reconhecedordeplacas.viewmodel
 
-import android.graphics.Bitmap
+import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
+import com.example.reconhecedordeplacas.api.PlateRecognizerClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,11 +21,13 @@ data class DetectionStatus(
 )
 
 class CameraViewModel(
-    private val plateRecognizerClient: PlateRecognizerClient
+    private val plateRecognizerClient: PlateRecognizerClient,
+    private val application: Application
 ) : ViewModel() {
 
     private val _detectionStatus = MutableStateFlow(DetectionStatus())
     val detectionStatus: StateFlow<DetectionStatus> = _detectionStatus
+    private lateinit var appContext: Context
 
     private var lastDetectionTime = 0L
     private val throttleMillis = 10_000L // 10 segundos
@@ -37,14 +41,14 @@ class CameraViewModel(
                 it.setSurfaceProvider(previewView.surfaceProvider)
             }
 
-            val imageCapture = ImageCapture.Builder().build()
-
             val analyzer = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
                     it.setAnalyzer(Executors.newSingleThreadExecutor()) { imageProxy ->
-                        handleFrame(imageProxy, imageCapture)
+                        // Aqui você poderia apenas logar, sem capturar imagem por enquanto
+                        Log.d("Analyzer", "Frame recebido: ${imageProxy.image?.timestamp}")
+                        imageProxy.close()
                     }
                 }
 
@@ -55,9 +59,10 @@ class CameraViewModel(
                 lifecycleOwner,
                 cameraSelector,
                 preview,
-                imageCapture,
                 analyzer
             )
+
+            Log.d("CameraViewModel", "Camera ligada com sucesso")
         }, ContextCompat.getMainExecutor(previewView.context))
     }
 
@@ -67,7 +72,7 @@ class CameraViewModel(
             lastDetectionTime = currentTime
 
             imageCapture.takePicture(
-                ContextCompat.getMainExecutor(imageCapture.context),
+                ContextCompat.getMainExecutor(application.applicationContext),
                 object : ImageCapture.OnImageCapturedCallback() {
                     override fun onCaptureSuccess(image: ImageProxy) {
                         sendToPlateRecognizer(image)

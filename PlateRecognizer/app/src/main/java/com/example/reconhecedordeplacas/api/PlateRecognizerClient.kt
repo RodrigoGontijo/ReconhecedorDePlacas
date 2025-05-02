@@ -2,6 +2,7 @@ package com.example.reconhecedordeplacas.api
 
 import android.graphics.Bitmap
 import android.util.Log
+import com.example.reconhecedordeplacas.extension.toMultipartBody
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 

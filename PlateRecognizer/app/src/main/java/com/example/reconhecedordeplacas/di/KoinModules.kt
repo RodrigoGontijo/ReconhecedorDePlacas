@@ -1,16 +1,20 @@
 package com.example.reconhecedordeplacas.di
 
+import android.app.Application
 import com.example.reconhecedordeplacas.api.PlateRecognizerApi
 import com.example.reconhecedordeplacas.api.PlateRecognizerClient
 import com.example.reconhecedordeplacas.viewmodel.CameraViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 val appModule = module {
+
+    single<Application> { androidContext() as Application }
 
     single {
         Retrofit.Builder()
@@ -35,5 +39,5 @@ val appModule = module {
 
     single { PlateRecognizerClient(get()) }
 
-    viewModel { CameraViewModel(get()) }
+    viewModel { CameraViewModel(get(), get()) }
 }
