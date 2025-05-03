@@ -123,7 +123,6 @@ class CameraViewModel(
                                         Toast.makeText(getApplication(), "Veículo detectado!", Toast.LENGTH_SHORT).show()
                                         drawOverlayOnPreview(previewView, rects)
                                     }
-                                    drawBoundingBoxes(bitmap, rects)
                                     saveImage(bitmap)
 
                                     // Delay de 10 segundos antes da próxima detecção
@@ -270,7 +269,9 @@ class CameraViewModel(
             try {
                 _detectionStatus.value = DetectionStatus(true, null)
                 Log.d("PlateRecognizer", "Enviando imagem para PlateRecognizer")
-                val result = plateRecognizerClient.sendImage(bitmap)
+                val resizedBitmap = resizeBitmapForUpload(bitmap)
+
+                val result = plateRecognizerClient.sendImage(resizedBitmap)
                 Log.d("PlateRecognizer", "Resposta recebida: $result")
 
                 val plate = result.results.firstOrNull()?.plate ?: "placa desconhecida"
@@ -284,6 +285,26 @@ class CameraViewModel(
                 _detectionStatus.value = DetectionStatus(false, null)
             }
         }
+    }
+
+    private fun resizeBitmapForUpload(original: Bitmap): Bitmap {
+        val maxWidth = 1280
+        val maxHeight = 720
+
+        val aspectRatio = original.width.toFloat() / original.height.toFloat()
+
+        val width: Int
+        val height: Int
+
+        if (aspectRatio > 1) {
+            width = maxWidth
+            height = (maxWidth / aspectRatio).toInt()
+        } else {
+            height = maxHeight
+            width = (maxHeight * aspectRatio).toInt()
+        }
+
+        return Bitmap.createScaledBitmap(original, width, height, true)
     }
 }
 

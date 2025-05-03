@@ -18,12 +18,12 @@ val appModule = module {
 
     single {
         Retrofit.Builder()
-            .baseUrl("https://api.platerecognizer.com/")
+            .baseUrl("https://api.platerecognizer.com")
             .client(
                 OkHttpClient.Builder()
                     .addInterceptor {
                         val request = it.request().newBuilder()
-                            .addHeader("Authorization", "b229a711dc6aa3d3ecbe821c51b0193e6cd315d0")
+                            .addHeader("Authorization", "Token 1e4ea982cb8aefd6bbc62b1e59a7fc025beacdd8")
                             .build()
                         it.proceed(request)
                     }
