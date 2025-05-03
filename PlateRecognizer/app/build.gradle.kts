@@ -69,9 +69,10 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.1")
 
     // CameraX
-    implementation("androidx.camera:camera-camera2:1.3.1")
-    implementation("androidx.camera:camera-lifecycle:1.3.1")
-    implementation("androidx.camera:camera-view:1.3.1")
+    implementation("androidx.camera:camera-core:1.3.0")
+    implementation("androidx.camera:camera-camera2:1.3.0")
+    implementation("androidx.camera:camera-lifecycle:1.3.0")
+    implementation("androidx.camera:camera-view:1.3.0")
 
     // Retrofit + Gson
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -90,4 +91,12 @@ dependencies {
 
     // Kotlin Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    implementation("com.google.mlkit:object-detection:17.0.0")
+    implementation("com.google.mlkit:object-detection-custom:17.0.0")
+
+
+    implementation("org.tensorflow:tensorflow-lite:2.13.0")
+    implementation("org.tensorflow:tensorflow-lite-support:0.4.3")
+    implementation("org.tensorflow:tensorflow-lite-gpu:2.13.0") // opcional
 }
