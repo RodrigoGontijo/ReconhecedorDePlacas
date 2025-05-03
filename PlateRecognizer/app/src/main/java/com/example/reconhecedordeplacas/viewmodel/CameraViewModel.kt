@@ -16,6 +16,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewModelScope
 import com.example.reconhecedordeplacas.api.PlateRecognizerClient
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -124,7 +125,12 @@ class CameraViewModel(
                                     }
                                     drawBoundingBoxes(bitmap, rects)
                                     saveImage(bitmap)
-                                    sendToPlateRecognizer(bitmap)
+
+                                    // Delay de 10 segundos antes da próxima detecção
+                                    viewModelScope.launch(Dispatchers.IO) {
+                                        sendToPlateRecognizer(bitmap)
+                                        delay(throttleMillis)
+                                    }
                                 } else {
                                     Log.d("CameraViewModel", "Nenhum veículo detectado")
                                 }
@@ -265,8 +271,14 @@ class CameraViewModel(
                 _detectionStatus.value = DetectionStatus(true, null)
                 Log.d("PlateRecognizer", "Enviando imagem para PlateRecognizer")
                 val result = plateRecognizerClient.sendImage(bitmap)
-                _detectionStatus.value = DetectionStatus(false, result)
                 Log.d("PlateRecognizer", "Resposta recebida: $result")
+
+                val plate = result.results.firstOrNull()?.plate ?: "placa desconhecida"
+                val model = result.results.firstOrNull()?.vehicle?.make_model?.firstOrNull()?.name ?: "modelo desconhecido"
+                viewModelScope.launch(Dispatchers.Main) {
+                    Toast.makeText(getApplication(), "Placa: $plate\nModelo: $model", Toast.LENGTH_LONG).show()
+                }
+
             } catch (e: Exception) {
                 Log.e("PlateRecognizer", "Erro ao enviar imagem: ${e.message}")
                 _detectionStatus.value = DetectionStatus(false, null)

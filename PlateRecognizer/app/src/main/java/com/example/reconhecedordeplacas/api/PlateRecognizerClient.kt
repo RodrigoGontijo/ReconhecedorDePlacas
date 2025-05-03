@@ -1,27 +1,22 @@
 package com.example.reconhecedordeplacas.api
 
+
 import android.graphics.Bitmap
-import android.util.Log
-import com.example.reconhecedordeplacas.extension.toMultipartBody
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.ByteArrayOutputStream
 
-class PlateRecognizerClient(
-    private val api: PlateRecognizerApi
-) {
-    suspend fun sendImage(bitmap: Bitmap): String? {
-        val imagePart = bitmap.toMultipartBody("image.jpg")
+class PlateRecognizerClient(private val api: PlateRecognizerApi) {
 
-        val response = api.recognizePlate(
-            image = imagePart,
-            region = "br".toRequestBody("text/plain".toMediaType())
-        )
+    suspend fun sendImage(bitmap: Bitmap): PlateRecognitionResponse {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        val imageBytes = stream.toByteArray()
 
-        return if (response.isSuccessful) {
-            response.body()?.string()
-        } else {
-            Log.e("PlateRecognizer", "Erro: ${response.code()}")
-            null
-        }
+        val requestBody = imageBytes.toRequestBody("image/jpeg".toMediaType())
+        val imagePart = MultipartBody.Part.createFormData("upload", "image.jpg", requestBody)
+
+        return api.recognizePlate(imagePart)
     }
 }

@@ -23,13 +23,14 @@ val appModule = module {
                 OkHttpClient.Builder()
                     .addInterceptor {
                         val request = it.request().newBuilder()
-                            .addHeader("Authorization", "Token SUA_CHAVE_AQUI")
+                            .addHeader("Authorization", "b229a711dc6aa3d3ecbe821c51b0193e6cd315d0")
                             .build()
                         it.proceed(request)
                     }
                     .addInterceptor(HttpLoggingInterceptor().apply {
                         level = HttpLoggingInterceptor.Level.BODY
                     })
+
                     .build()
             )
             .addConverterFactory(GsonConverterFactory.create())
