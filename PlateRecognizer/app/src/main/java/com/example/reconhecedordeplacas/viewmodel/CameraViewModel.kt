@@ -111,8 +111,9 @@ class CameraViewModel(
                 object : ImageCapture.OnImageCapturedCallback() {
                     override fun onCaptureSuccess(image: ImageProxy) {
                         val originalBitmap = image.toBitmap()
-                        val bitmap = Bitmap.createBitmap(originalBitmap.width, originalBitmap.height, Bitmap.Config.ARGB_8888)
-                        Canvas(bitmap).drawBitmap(originalBitmap, 0f, 0f, null)
+                        val rotatedBitmap = rotateBitmapIfNeeded(originalBitmap, image.imageInfo.rotationDegrees)
+                        val bitmap = Bitmap.createBitmap(rotatedBitmap.width, rotatedBitmap.height, Bitmap.Config.ARGB_8888)
+                        Canvas(bitmap).drawBitmap(rotatedBitmap, 0f, 0f, null)
 
                         Log.d("CameraViewModel", "Imagem capturada com sucesso")
                         if (::tflite.isInitialized) {
@@ -305,6 +306,14 @@ class CameraViewModel(
         }
 
         return Bitmap.createScaledBitmap(original, width, height, true)
+    }
+
+    fun rotateBitmapIfNeeded(bitmap: Bitmap, rotationDegrees: Int): Bitmap {
+        if (rotationDegrees == 0) return bitmap
+        val matrix = Matrix().apply {
+            postRotate(rotationDegrees.toFloat())
+        }
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 }
 
